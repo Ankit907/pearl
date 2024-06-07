@@ -53,17 +53,30 @@ jobs:
           container-name: hello-world
           image: 637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world:latest
 
+      - name: Register task definition
+        id: register-task-def
+        run: |
+          TASK_DEFINITION=$(cat ecs-task-def.json)
+          REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
+          echo "REGISTERED_TASK_DEFINITION=$REGISTERED_TASK_DEFINITION" >> $GITHUB_ENV
+          
+      - name: Extract task definition ARN
+        id: extract-arn
+        run: |
+          TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
+          echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
+
       - name: Create or update ECS service
         run: |
           CLUSTER_NAME=hello-world-cluster
           SERVICE_NAME=hello-world-service
-          TASK_DEFINITION=$(cat ${{ steps.task-def.outputs.task-definition }} | jq -r .taskDefinitionArn)
+          TASK_DEFINITION_ARN=${{ env.TASK_DEFINITION_ARN }}
 
           if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME | grep -q "serviceName"; then
             aws ecs create-service \
               --cluster $CLUSTER_NAME \
               --service-name $SERVICE_NAME \
-              --task-definition $TASK_DEFINITION \
+              --task-definition $TASK_DEFINITION_ARN \
               --desired-count 1 \
               --launch-type "FARGATE" \
               --network-configuration "awsvpcConfiguration={subnets=[subnet-0123456789abcdef0],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}"
@@ -71,14 +84,14 @@ jobs:
             aws ecs update-service \
               --cluster $CLUSTER_NAME \
               --service $SERVICE_NAME \
-              --task-definition $TASK_DEFINITION
+              --task-definition $TASK_DEFINITION_ARN
           fi
 
       - name: Deploy to ECS
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: ${{ env.TASK_DEFINITION_ARN }}
           service: hello-world-service
           cluster: hello-world-cluster
           wait-for-service-stability: true
