@@ -1,6 +1,5 @@
 {
   "family": "hello-world-task",
-  "networkMode": "awsvpc",
   "containerDefinitions": [
     {
       "name": "hello-world",
@@ -8,16 +7,16 @@
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 3000,
-          "hostPort": 3000
+          "containerPort": 80,
+          "hostPort": 80
         }
-      ],
-      "memory": 512,
-      "cpu": 256
+      ]
     }
   ],
-  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
   "cpu": "256",
-  "memory": "512",
-  "executionRoleArn": "arn:aws:iam::637423558639:role/ecsTaskExecutionRole"
+  "memory": "512"
 }
