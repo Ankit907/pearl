@@ -57,9 +57,9 @@ jobs:
         run: |
           CLUSTER_NAME=hello-world-cluster
           SERVICE_NAME=hello-world-service
-          TASK_DEFINITION=${{ steps.task-def.outputs.task-definition }}
+          TASK_DEFINITION=$(cat ${{ steps.task-def.outputs.task-definition }} | jq -r .taskDefinitionArn)
 
-          if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME; then
+          if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME | grep -q "serviceName"; then
             aws ecs create-service \
               --cluster $CLUSTER_NAME \
               --service-name $SERVICE_NAME \
