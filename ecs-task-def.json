@@ -1,6 +1,6 @@
 {
   "family": "hello-world-task",
-  "executionRoleArn": "arn:aws:iam::637423558639:role/ecsTaskExecutionRole", 
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "hello-world",
