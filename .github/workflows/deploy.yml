@@ -53,6 +53,27 @@ jobs:
           container-name: hello-world
           image: 637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world:latest
 
+      - name: Create or update ECS service
+        run: |
+          CLUSTER_NAME=hello-world-cluster
+          SERVICE_NAME=hello-world-service
+          TASK_DEFINITION=${{ steps.task-def.outputs.task-definition }}
+
+          if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME; then
+            aws ecs create-service \
+              --cluster $CLUSTER_NAME \
+              --service-name $SERVICE_NAME \
+              --task-definition $TASK_DEFINITION \
+              --desired-count 1 \
+              --launch-type "FARGATE" \
+              --network-configuration "awsvpcConfiguration={subnets=[subnet-0123456789abcdef0],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}"
+          else
+            aws ecs update-service \
+              --cluster $CLUSTER_NAME \
+              --service $SERVICE_NAME \
+              --task-definition $TASK_DEFINITION
+          fi
+
       - name: Deploy to ECS
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
