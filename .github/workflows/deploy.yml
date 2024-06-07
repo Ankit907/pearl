@@ -21,9 +21,13 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
+          aws-region: us-east-1  # Change region to us-east-1 for public ECR login
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR Public
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/h6l4w7j4
+
+      - name: Login to Amazon ECR (Private)
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and push Docker image
@@ -32,7 +36,6 @@ jobs:
           REPOSITORY_URI=637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world
           IMAGE_TAG=latest
           docker build -t $REPOSITORY_URI:$IMAGE_TAG .
-          echo ${{ secrets.AWS_ACCESS_KEY_ID }} | docker login -u AWS --password-stdin $REPOSITORY_URI
           docker push $REPOSITORY_URI:$IMAGE_TAG
 
       - name: Create task definition
