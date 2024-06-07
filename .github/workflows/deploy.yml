@@ -29,7 +29,7 @@ jobs:
       - name: Build and push Docker image
         id: build-image
         run: |
-          REPOSITORY_URI=123456789012.dkr.ecr.ap-south-1.amazonaws.com/hello-world
+          REPOSITORY_URI=637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world
           IMAGE_TAG=latest
           docker build -t $REPOSITORY_URI:$IMAGE_TAG .
           echo ${{ secrets.AWS_ACCESS_KEY_ID }} | docker login -u AWS --password-stdin $REPOSITORY_URI
@@ -41,7 +41,7 @@ jobs:
         with:
           task-definition: ecs-task-def.json
           container-name: hello-world
-          image: 123456789012.dkr.ecr.ap-south-1.amazonaws.com/hello-world:latest
+          image: 637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world:latest
 
       - name: Deploy to ECS
         id: deploy-ecs
