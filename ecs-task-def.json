@@ -1,0 +1,24 @@
+{
+  "family": "hello-world-task",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "hello-world",
+      "image": "YOUR_ECR_REPOSITORY_URI:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000
+        }
+      ],
+      "memory": 512,
+      "cpu": 256
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole"
+}
+
