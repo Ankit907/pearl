@@ -4,7 +4,7 @@
   "containerDefinitions": [
     {
       "name": "hello-world",
-      "image": "YOUR_ECR_REPOSITORY_URI:latest",
+      "image": "123456789012.dkr.ecr.ap-south-1.amazonaws.com/hello-world:latest",
       "essential": true,
       "portMappings": [
         {
@@ -19,6 +19,5 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole"
 }
-
