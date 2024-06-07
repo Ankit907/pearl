@@ -1,19 +1,17 @@
+# main.tf
 provider "aws" {
   region = "ap-south-1"
 }
 
-# Create a VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
 
-# Create a Subnet
 resource "aws_subnet" "main" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.0/24"
 }
 
-# Create a Security Group to allow HTTP traffic
 resource "aws_security_group" "allow_http" {
   vpc_id = aws_vpc.main.id
 
@@ -32,17 +30,37 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
-# Create an ECR Repository
-resource "aws_ecr_repository" "hello_world" {
-  name = "hello-world-repo"
-}
-
-# Create an ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "hello-world-cluster"
 }
 
-# Create an IAM Role for ECS Task Execution
+resource "aws_ecs_task_definition" "hello_world" {
+  family                   = "hello-world-task"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+
+  container_definitions = jsonencode([
+    {
+      name  = "hello-world"
+      image = "${aws_ecr_repository.hello_world.repository_url}:latest"
+      portMappings = [
+        {
+          containerPort = 3000
+          hostPort      = 3000
+        }
+      ]
+    }
+  ])
+
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+}
+
+resource "aws_ecr_repository" "hello_world" {
+  name = "hello-world-boss"
+}
+
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
@@ -64,27 +82,6 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   ]
 }
 
-# Create an ECS Task Definition
-resource "aws_ecs_task_definition" "hello_world" {
-  family                   = "hello-world-task"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
-
-  container_definitions = jsonencode([{
-    name  = "hello-world"
-    image = "${aws_ecr_repository.hello_world.repository_url}:latest"
-    portMappings = [{
-      containerPort = 3000
-      hostPort      = 3000
-    }]
-  }])
-
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-}
-
-# Create an ECS Service
 resource "aws_ecs_service" "hello_world" {
   name            = "hello-world-service"
   cluster         = aws_ecs_cluster.main.id
@@ -98,4 +95,3 @@ resource "aws_ecs_service" "hello_world" {
     assign_public_ip = true
   }
 }
-
