@@ -1,6 +1,5 @@
 {
   "family": "hello-world-task",
-  "executionRoleArn": "arn:aws:iam::637423558639:role/ecsTaskExecutionRole", // Replace with your actual execution role ARN
   "containerDefinitions": [
     {
       "name": "hello-world",
