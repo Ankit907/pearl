@@ -12,14 +12,11 @@ jobs:
     steps:
       # Previous steps remain unchanged
 
-      - name: Set task definition ARN as environment variable
-        run: echo "TASK_DEFINITION_ARN=arn:aws:ecs:us-east-1:637423558639:task-definition/my-task-family:12" >> $GITHUB_ENV
-
       - name: Deploy to ECS
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ env.TASK_DEFINITION_ARN }}
+          task-definition: "arn:aws:ecs:us-east-1:637423558639:task-definition/my-task-family:12"
           service: hello-world-service
           cluster: hello-world-cluster
           wait-for-service-stability: true
