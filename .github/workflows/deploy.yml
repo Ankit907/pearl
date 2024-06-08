@@ -87,6 +87,7 @@ jobs:
           fi
           TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
           echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
+          echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV_FILE
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_REGION: us-east-1
