@@ -104,21 +104,11 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Create ECS task definition directory if not exists
+        run: mkdir -p arn:aws:ecs:us-east-1:637423558639:task-definition
+
       - name: Create empty ECS task definition file
         if: success()
         run: touch arn:aws:ecs:us-east-1:637423558639:task-definition/my-task-family:16
 
       - name: Deploy to ECS
-        id: deploy-ecs
-        if: success()
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ env.TASK_DEFINITION_ARN }}
-          service: hello-world-service
-          cluster: hello-world-cluster
-          wait-for-service-stability: true
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
