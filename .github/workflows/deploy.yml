@@ -75,35 +75,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Create or update ECS service
-        run: |
-          CLUSTER_NAME=hello-world-cluster
-          SERVICE_NAME=hello-world-service
-          TASK_DEFINITION_ARN=${{ env.TASK_DEFINITION_ARN }}
-
-          SUBNET_ID_1=subnet-0d888ca3809038667
-          SECURITY_GROUP_ID=sg-0bff9fda1d0ace463
-
-          if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME | grep -q "serviceName"; then
-            aws ecs create-service \
-              --cluster $CLUSTER_NAME \
-              --service-name $SERVICE_NAME \
-              --task-definition $TASK_DEFINITION_ARN \
-              --desired-count 1 \
-              --launch-type "FARGATE" \
-              --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID_1],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}"
-          else
-            aws ecs update-service \
-              --cluster $CLUSTER_NAME \
-              --service $SERVICE_NAME \
-              --task-definition $TASK_DEFINITION_ARN
-          fi
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
       - name: Create ECS task definition directory if not exists
         run: mkdir -p arn:aws:ecs:us-east-1:637423558639:task-definition
 
