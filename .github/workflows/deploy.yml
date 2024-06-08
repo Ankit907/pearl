@@ -39,7 +39,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Change region to us-east-1 for public ECR login
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR Public
         run: |
@@ -63,19 +63,16 @@ jobs:
             exit 1
           fi
 
+          # Extract the task definition ARN
+          TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
+
           # Export the registered task definition to GitHub environment
-          echo "REGISTERED_TASK_DEFINITION=$REGISTERED_TASK_DEFINITION" >> $GITHUB_ENV
+          echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Extract task definition ARN
-        id: extract-arn
-        run: |
-          TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
-          echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
 
       - name: Create or update ECS service
         run: |
