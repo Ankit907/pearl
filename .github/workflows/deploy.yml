@@ -52,6 +52,7 @@ jobs:
           cat > task-def.json <<EOF
           {
             "family": "my-task-family",
+            "executionRoleArn": "arn:aws:iam::637423558639:role/ecsTaskExecutionRole",
             "networkMode": "awsvpc",
             "containerDefinitions": [
               {
