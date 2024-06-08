@@ -45,6 +45,13 @@ jobs:
         run: |
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/h6l4w7j4
 
+      - name: Check if ECS task definition file exists
+        run: |
+          if [ ! -f "ecs-task-def.json" ]; then
+            echo "ECS task definition file does not exist"
+            exit 1
+          fi
+
       - name: Register ECS Task Definition
         id: register-task-def
         run: |
@@ -106,6 +113,7 @@ jobs:
 
       - name: Deploy to ECS
         id: deploy-ecs
+        if: success()
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ env.TASK_DEFINITION_ARN }}
