@@ -112,7 +112,3 @@ jobs:
           service: hello-world-service
           cluster: hello-world-cluster
           wait-for-service-stability: true
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS
