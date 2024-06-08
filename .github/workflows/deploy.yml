@@ -16,7 +16,6 @@ jobs:
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: "arn:aws:ecs:us-east-1:637423558639:task-definition/my-task-family:12"
           service: hello-world-service
           cluster: hello-world-cluster
           wait-for-service-stability: true
@@ -25,3 +24,4 @@ jobs:
           AWS_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TASK_DEFINITION_ARN: "arn:aws:ecs:us-east-1:637423558639:task-definition/my-task-family:12"
