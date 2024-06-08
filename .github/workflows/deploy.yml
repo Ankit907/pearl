@@ -48,25 +48,14 @@ jobs:
       - name: Register ECS Task Definition
         id: register-task-def
         run: |
-          # Load the task definition JSON into a variable
           TASK_DEFINITION=$(cat ecs-task-def.json)
-
-          # Validate JSON (optional, but recommended)
           echo "$TASK_DEFINITION" | jq .
-
-          # Register the task definition with AWS ECS
           REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
-
-          # Check if registration was successful
           if [ $? -ne 0 ]; then
             echo "Task definition registration failed"
             exit 1
           fi
-
-          # Extract the task definition ARN
           TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
-
-          # Export the registered task definition to GitHub environment
           echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
         env:
           AWS_DEFAULT_REGION: us-east-1
@@ -80,6 +69,11 @@ jobs:
           SERVICE_NAME=hello-world-service
           TASK_DEFINITION_ARN=${{ env.TASK_DEFINITION_ARN }}
 
+          # Replace these placeholders with actual subnet and security group IDs
+          SUBNET_ID_1=subnet-0acd58e008ef56026  # Replace with your actual subnet ID
+          SUBNET_ID_2=subnet-099ac576c1234e35c  # Replace with another actual subnet ID if needed
+          SECURITY_GROUP_ID=sg-0bd480672f4a14a7b  # Replace with your actual security group ID
+
           if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME | grep -q "serviceName"; then
             aws ecs create-service \
               --cluster $CLUSTER_NAME \
@@ -87,13 +81,18 @@ jobs:
               --task-definition $TASK_DEFINITION_ARN \
               --desired-count 1 \
               --launch-type "FARGATE" \
-              --network-configuration "awsvpcConfiguration={subnets=[subnet-0123456789abcdef0],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}"
+              --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID_1,$SUBNET_ID_2],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}"
           else
             aws ecs update-service \
               --cluster $CLUSTER_NAME \
               --service $SERVICE_NAME \
               --task-definition $TASK_DEFINITION_ARN
           fi
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Deploy to ECS
         id: deploy-ecs
