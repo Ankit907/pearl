@@ -45,10 +45,8 @@ jobs:
         run: |
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/h6l4w7j4
 
-      - name: Register ECS Task Definition
-        id: register-task-def
+      - name: Create ECS task definition file
         run: |
-          echo "Creating ECS task definition file"
           cat > ecs-task-def.json <<EOF
           {
             "family": "my-task-family",
@@ -77,6 +75,9 @@ jobs:
           }
           EOF
 
+      - name: Register ECS Task Definition
+        id: register-task-def
+        run: |
           TASK_DEFINITION=$(cat ecs-task-def.json)
           echo "$TASK_DEFINITION" | jq .
           REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
