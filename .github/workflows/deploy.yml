@@ -70,8 +70,8 @@ jobs:
           TASK_DEFINITION_ARN=${{ env.TASK_DEFINITION_ARN }}
 
           # Replace these placeholders with actual subnet and security group IDs
-          SUBNET_ID_1=-subnet-0d888ca3809038667  # Replace with your actual subnet ID
-          SECURITY_GROUP_ID=sg-0bff9fda1d0ace463  # Replace with your actual security group ID
+          SUBNET_ID_1=subnet-0d888ca3809038667  # Confirmed subnet ID
+          SECURITY_GROUP_ID=sg-0bff9fda1d0ace463  # Confirmed security group ID
 
           if ! aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME | grep -q "serviceName"; then
             aws ecs create-service \
@@ -80,7 +80,7 @@ jobs:
               --task-definition $TASK_DEFINITION_ARN \
               --desired-count 1 \
               --launch-type "FARGATE" \
-              --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID_1,$SUBNET_ID_2],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}"
+              --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID_1],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}"
           else
             aws ecs update-service \
               --cluster $CLUSTER_NAME \
