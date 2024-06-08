@@ -81,10 +81,6 @@ jobs:
           TASK_DEFINITION=$(cat ecs-task-def.json)
           echo "$TASK_DEFINITION" | jq .
           REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
-          if [ $? -ne 0 ]; then
-            echo "Task definition registration failed"
-            exit 1
-          fi
           TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
           echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
         env:
