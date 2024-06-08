@@ -45,21 +45,32 @@ jobs:
         run: |
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/h6l4w7j4
 
-      - name: Create task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: ecs-task-def.json
-          container-name: hello-world
-          image: 637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world:latest
-
-      - name: Register task definition
+      - name: Register ECS Task Definition
         id: register-task-def
         run: |
+          # Load the task definition JSON into a variable
           TASK_DEFINITION=$(cat ecs-task-def.json)
+
+          # Validate JSON (optional, but recommended)
+          echo "$TASK_DEFINITION" | jq .
+
+          # Register the task definition with AWS ECS
           REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
+
+          # Check if registration was successful
+          if [ $? -ne 0 ]; then
+            echo "Task definition registration failed"
+            exit 1
+          fi
+
+          # Export the registered task definition to GitHub environment
           echo "REGISTERED_TASK_DEFINITION=$REGISTERED_TASK_DEFINITION" >> $GITHUB_ENV
-          
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Extract task definition ARN
         id: extract-arn
         run: |
