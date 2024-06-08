@@ -16,22 +16,6 @@ jobs:
       - name: Set error flag to false
         run: echo "ERROR_STEP=false" >> $GITHUB_ENV
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        if: env.ERROR_STEP != 'true'
-
-      - name: Configure AWS credentials for private ECR
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-        if: env.ERROR_STEP != 'true'
-
-      - name: Login to Amazon ECR (Private)
-        uses: aws-actions/amazon-ecr-login@v1
-        if: env.ERROR_STEP != 'true'
-
       # Other steps...
 
       - name: Create ECS task definition file
@@ -68,14 +52,30 @@ jobs:
 
       # Other steps...
 
+      - name: Check if ECS task definition file exists
+        id: check-task-def-exists
+        run: |
+          if [ -f "ecs-task-def.json" ]; then
+            echo "::set-output name=file-exists::true"
+          else
+            echo "::set-output name=file-exists::false"
+          fi
+        continue-on-error: true
+        if: env.ERROR_STEP != 'true'
+
       - name: Register ECS Task Definition
         id: register-task-def
         run: |
-          TASK_DEFINITION=$(cat ecs-task-def.json)
-          echo "$TASK_DEFINITION" | jq .
-          REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
-          TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
-          echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
+          if [ "${{ steps.check-task-def-exists.outputs.file-exists }}" == "true" ]; then
+            TASK_DEFINITION=$(cat ecs-task-def.json)
+            echo "$TASK_DEFINITION" | jq .
+            REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json "$TASK_DEFINITION")
+            TASK_DEFINITION_ARN=$(echo $REGISTERED_TASK_DEFINITION | jq -r '.taskDefinition.taskDefinitionArn')
+            echo "TASK_DEFINITION_ARN=$TASK_DEFINITION_ARN" >> $GITHUB_ENV
+          else
+            echo "ECS task definition file not found. Skipping registration."
+            echo "ERROR_STEP=true" >> $GITHUB_ENV
+          fi
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_REGION: us-east-1
