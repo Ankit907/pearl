@@ -74,6 +74,7 @@ jobs:
             "memory": "512"
           }
           EOF
+        working-directory: ${{ github.workspace }}
 
       - name: Register ECS Task Definition
         id: register-task-def
