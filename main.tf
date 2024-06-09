@@ -49,7 +49,7 @@ resource "aws_security_group" "allow_http" {
 }
 
 resource "aws_ecr_repository" "hello_world" {
-  name = "hello-world-pearl1"
+  name = "hello-world-ecr"
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
