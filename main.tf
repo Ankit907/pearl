@@ -12,7 +12,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "main" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24" 
+  cidr_block = "10.0.3.0/24"
 
   tags = {
     Name = "main_subnet"
@@ -49,7 +49,7 @@ resource "aws_security_group" "allow_http" {
 }
 
 resource "aws_ecr_repository" "hello_world" {
-  name = "hello-world-dev"
+  name = "hello-world-devops"
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
