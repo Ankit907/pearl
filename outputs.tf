@@ -1,13 +1,13 @@
 output "vpc_id" {
-  value = aws_vpc.main.id
+  value = "vpc-0531999bac150f396"
 }
 
 output "subnet_id" {
-  value = aws_subnet.main.id
+  value = "subnet-0bdd2bf458fd2f00f"
 }
 
 output "security_group_id" {
-  value = aws_security_group.allow_http.id
+  value = "sg-0ea6b508f978e04be"
 }
 
 output "ecs_cluster_id" {
