@@ -1,4 +1,4 @@
-# Hello World Node.js App on AWS ECS/Fargate with Terraform and GitHub Actions
+# Hello World Node.js App on AWS ECS/Fargate with Terraform and GitHub Actions given by PEARL THOUGHTS ORGANISATION
 PEARL THOUGHTS TASK (ANKIT CHOUREY)
 This project demonstrates how to deploy a simple "Hello World" Node.js application on AWS ECS/Fargate using Terraform for infrastructure as code and GitHub Actions for continuous deployment.
 
