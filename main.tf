@@ -2,6 +2,52 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "main_vpc"
+  }
+}
+
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "main_subnet"
+  }
+}
+
+resource "aws_security_group" "allow_http" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow_http"
+  }
+}
+
 resource "aws_ecr_repository" "hello_world" {
   name = "hello-world-pearl1"
 }
@@ -62,8 +108,8 @@ resource "aws_ecs_service" "hello_world" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = ["subnet-0bdd2bf458fd2f00f"]
-    security_groups  = ["sg-0ea6b508f978e04be"]
+    subnets          = [aws_subnet.main.id]
+    security_groups  = [aws_security_group.allow_http.id]
     assign_public_ip = true
   }
 }
@@ -71,4 +117,16 @@ resource "aws_ecs_service" "hello_world" {
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
   capacity_providers = ["FARGATE"]
+}
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+
+output "subnet_id" {
+  value = aws_subnet.main.id
+}
+
+output "security_group_id" {
+  value = aws_security_group.allow_http.id
 }
