@@ -44,7 +44,7 @@ resource "aws_ecs_task_definition" "hello_world" {
   container_definitions = jsonencode([
     {
       name  = "hello-world"
-      image = "${aws_ecr_repository.hello_world.repository_url}:latest"
+      image = "ankit8770/hello-world-nodejs:latest"
       portMappings = [
         {
           containerPort = 3000
@@ -58,7 +58,7 @@ resource "aws_ecs_task_definition" "hello_world" {
 }
 
 resource "aws_ecr_repository" "hello_world" {
-  name = "hello-world-boss"
+  name = "hello-world-pearl"
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
