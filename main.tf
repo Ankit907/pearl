@@ -2,50 +2,8 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-
-  tags = {
-    Name = "main_vpc"
-  }
-}
-
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-
-  tags = {
-    Name = "main_subnet"
-  }
-}
-
-resource "aws_security_group" "allow_http" {
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "allow_http"
-  }
+resource "aws_ecr_repository" "hello_world" {
+  name = "hello-world-pearl1"
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
@@ -83,7 +41,7 @@ resource "aws_ecs_task_definition" "hello_world" {
   container_definitions = jsonencode([
     {
       name  = "hello-world"
-      image = "ankit8770/hello-world-nodejs:latest"
+      image = "637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world-pearl:latest"
       portMappings = [
         {
           containerPort = 3000
@@ -104,8 +62,8 @@ resource "aws_ecs_service" "hello_world" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.main.id]
-    security_groups  = [aws_security_group.allow_http.id]
+    subnets          = ["subnet-0bdd2bf458fd2f00f"]
+    security_groups  = ["sg-0ea6b508f978e04be"]
     assign_public_ip = true
   }
 }
