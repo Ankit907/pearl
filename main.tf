@@ -2,14 +2,6 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-data "terraform_remote_state" "outputs" {
-  backend = "local"
-
-  config = {
-    path = "outputs.tfstate"
-  }
-}
-
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
@@ -19,7 +11,7 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "main" {
-  vpc_id     = data.terraform_remote_state.outputs.outputs["vpc_id"]
+  vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.0/24"
 
   tags = {
@@ -28,7 +20,7 @@ resource "aws_subnet" "main" {
 }
 
 resource "aws_security_group" "allow_http" {
-  vpc_id = data.terraform_remote_state.outputs.outputs["vpc_id"]
+  vpc_id = aws_vpc.main.id
 
   ingress {
     from_port   = 80
@@ -116,8 +108,8 @@ resource "aws_ecs_service" "hello_world" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [data.terraform_remote_state.outputs.outputs["subnet_id"]]
-    security_groups  = [data.terraform_remote_state.outputs.outputs["security_group_id"]]
+    subnets          = [aws_subnet.main.id]
+    security_groups  = [aws_security_group.allow_http.id]
     assign_public_ip = true
   }
 }
