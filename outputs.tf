@@ -1,13 +1,13 @@
 output "vpc_id" {
-  value = "vpc-0531999bac150f396"
+  value = aws_vpc.main.id
 }
 
 output "subnet_id" {
-  value = "subnet-0bdd2bf458fd2f00f"
+  value = aws_subnet.main.id
 }
 
 output "security_group_id" {
-  value = "sg-0ea6b508f978e04be"
+  value = aws_security_group.allow_http.id
 }
 
 output "ecs_cluster_id" {
@@ -17,4 +17,3 @@ output "ecs_cluster_id" {
 output "ecs_service_name" {
   value = aws_ecs_service.hello_world.name
 }
-
