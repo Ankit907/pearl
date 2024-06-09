@@ -48,9 +48,6 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
-resource "aws_ecr_repository" "hello_world" {
-  name = "hello-world-pearl1"
-}
 
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
@@ -87,7 +84,7 @@ resource "aws_ecs_task_definition" "hello_world" {
   container_definitions = jsonencode([
     {
       name  = "hello-world"
-      image = "637423558639.dkr.ecr.ap-south-1.amazonaws.com/hello-world-pearl:latest"
+      image = ankit8770/hello-world-nodejs
       portMappings = [
         {
           containerPort = 3000
