@@ -48,7 +48,6 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
-
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
@@ -84,7 +83,7 @@ resource "aws_ecs_task_definition" "hello_world" {
   container_definitions = jsonencode([
     {
       name  = "hello-world"
-      image = ankit8770/hello-world-nodejs
+      image = "ankit8770/hello-world-nodejs:latest"
       portMappings = [
         {
           containerPort = 3000
